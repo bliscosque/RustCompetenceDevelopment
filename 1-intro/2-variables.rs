@@ -12,4 +12,9 @@ fn main() {
     println!("n1+n2==0.3?{}",res1);
     let res2=n1 as f32 +n2 as f32 ==0.3_f32; //lowering the precision, they are equal...
     println!("n1+n2==0.3?{}",res2);
+
+    let s:String=String::from("hello");
+    let mut s1=s;
+    s1.push_str(" world");
+    println!("{s1}");
 }
