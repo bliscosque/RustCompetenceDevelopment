@@ -17,4 +17,8 @@ fn main() {
     let mut s1=s;
     s1.push_str(" world");
     println!("{s1}");
+
+    let s:String=String::from("hello");
+    let h=&s[0..2]; //0 a 1
+    println!("{h}");
 }
