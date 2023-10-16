@@ -1,3 +1,4 @@
+use std::io;
 fn main() {
     let mut i:i32=0;
     i+=1;
@@ -21,4 +22,12 @@ fn main() {
     let s:String=String::from("hello");
     let h=&s[0..2]; //0 a 1
     println!("{h}");
+
+    const PI:f32 = 3.14;
+    println!("{}",PI);
+
+    let mut name=String::new();
+    io::stdin().read_line(&mut name)
+        .expect("Didn't receive input");
+    println!("{}",name.trim_end());
 }
