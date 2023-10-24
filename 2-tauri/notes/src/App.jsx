@@ -5,10 +5,15 @@ import "./App.css";
 function App() {
 
   const [note,setNote] = useState("Hello");
+  const [isRendered,setRender] = useState(false);
+  const [markdownHTML, setMarkdownHTML] = useState("");
 
-  async function rederMarkdown() {
-    const response=await invoke("convert_markdown",{text: note});
-    console.log(response);
+  async function renderMarkdown() {
+    if (!isRendered) {
+      const response=await invoke("convert_markdown",{text: note});
+      setMarkdownHTML({__html:response});
+    }
+    setRender(!isRendered);
   }
 
   return (
@@ -17,10 +22,18 @@ function App() {
       <div className="flex justify-between items-center pb-2">
         <p>Editor</p>
         <div className="join">
-          <button className="btn btn-sm join-item" onClick={async () => {await rederMarkdown()}}>MD to HTML</button>
+          <label className="btn btn-sm join-item swap">
+            <input onChange={async () => {await renderMarkdown()}} type="checkbox"></input>
+            <div className="swap-on">HTML</div>
+            <div className="swap-off">MD</div>
+          </label>
         </div>
       </div>
+      {isRendered?
+      <div className="prose" dangerouslySetInnerHTML={markdownHTML}></div>
+      :
       <textarea value={note} onChange={e => {setNote(e.target.value)}} className="w-full" rows={20} />
+      }
       <p>{note}</p>
     </div>
   );
