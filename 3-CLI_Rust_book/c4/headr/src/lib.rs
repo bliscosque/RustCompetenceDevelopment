@@ -1,5 +1,7 @@
 use clap::{App, Arg};
 use std::error::Error;
+use std::io::{self,BufRead, BufReader,Read};
+use std::fs::File;
 
 type MyResult<T> = Result<T, Box<dyn Error>>;
 
@@ -23,32 +25,72 @@ pub fn get_args() -> MyResult<Config> {
                 .default_value("-"),
         )
         .arg(
-            Arg::with_name("number lines")
+            Arg::with_name("lines")
                 .short("n")
-                .long("number")
+                .long("lines")
+                .value_name("LINES")
                 .help("Number lines")
-                .takes_value(true)
-                .conflicts_with("number_bytes"),
+                .default_value("10")
         )
         .arg(
-            Arg::with_name("number bytes")
-                .short("b")
-                .long("number_bytes")
+            Arg::with_name("bytes")
+                .short("c")
+                .long("bytes")
+                .value_name("BYTES")
                 .help("Number bytes")
                 .takes_value(true)
-                .conflicts_with("number_lines"),
+                .conflicts_with("lines"),
         )
         .get_matches();
 
+    let lines=matches
+        .value_of("lines")
+        .map(parse_positive_int)
+        .transpose()
+        .map_err(|e| format!("illegal line count -- {}",e))?;
+
+    let bytes=matches
+        .value_of("bytes")
+        .map(parse_positive_int)
+        .transpose()
+        .map_err(|e| format!("illegal byte count -- {}",e))?;
+
     Ok(Config { 
         files: matches.values_of_lossy("files").unwrap(), 
-        lines: matches.value_of("number").unwrap().parse().unwrap(), 
-        bytes: Some(0)//matches.value_of("number_bytes").unwrap().parse().unwrap(), 
+        lines: lines.unwrap(), 
+        bytes: bytes,
     })
 }
 
 pub fn run(config: Config) -> MyResult<()> {
-    println!("{:#?}",config);
+    //println!("{:#?}",config);
+    let num_files=config.files.len();
+
+    for (file_num,filename) in config.files.iter().enumerate() {
+        match open(&filename) {
+            Err(err) => eprintln!("{}: {}",filename,err),
+            Ok(mut file) => {
+                if num_files>1 {
+                    println!("{}==> {} <==", if file_num>0 {"\n"} else {""},filename);
+                }
+                if let Some(num_bytes) = config.bytes {
+                    let mut handle = file.take(num_bytes as u64);
+                    let mut buffer=vec![0;num_bytes];
+                    let bytes_read=handle.read(&mut buffer)?;
+                    print!("{}",String::from_utf8_lossy(&buffer[..bytes_read]));
+                }
+                else {
+                    let mut line=String::new();
+                    for _ in 0..config.lines {
+                        let bytes=file.read_line(&mut line)?;
+                        if bytes==0 {break;}
+                        print!("{}",line);
+                        line.clear();
+                    }
+                }
+            }
+        }
+    }
     Ok(())
 }
 
@@ -75,4 +117,11 @@ fn test_parse_positive_int() {
     let res=parse_positive_int("0");
     assert!(res.is_err());
     assert_eq!(res.unwrap_err().to_string(),"0".to_string());
+}
+
+fn open(filename: &str) -> MyResult<Box<dyn BufRead>>{
+    match filename {
+        "-" => Ok(Box::new(BufReader::new(io::stdin()))),
+        _ => Ok(Box::new(BufReader::new(File::open(filename)?))),
+    }
 }
