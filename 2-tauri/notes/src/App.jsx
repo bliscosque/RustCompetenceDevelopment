@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { invoke } from "@tauri-apps/api/tauri";
+import {writeText} from "@tauri-apps/api/clipboard"
 import "./App.css";
 
 function App() {
@@ -20,13 +21,14 @@ function App() {
     <div className="m-2">
       
       <div className="flex justify-between items-center pb-2">
-        <p>Editor</p>
+        <h1>Editor</h1>
         <div className="join">
           <label className="btn btn-sm join-item swap">
             <input onChange={async () => {await renderMarkdown()}} type="checkbox"></input>
             <div className="swap-on">HTML</div>
             <div className="swap-off">MD</div>
           </label>
+          <button className="btn btn-sm join-item" onClick={() => {writeText(note)}}>Copy</button>
         </div>
       </div>
       {isRendered?
