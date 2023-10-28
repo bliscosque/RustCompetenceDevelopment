@@ -2,6 +2,12 @@ import { useState } from "react";
 import { invoke } from "@tauri-apps/api/tauri";
 import {writeText} from "@tauri-apps/api/clipboard"
 import "./App.css";
+import {
+  isPermissionGranted,
+  requestPermission,
+  sendNotification
+} from "@tauri-apps/api/notification"
+import { tauri } from "@tauri-apps/api";
 
 function App() {
 
@@ -28,7 +34,17 @@ function App() {
             <div className="swap-on">HTML</div>
             <div className="swap-off">MD</div>
           </label>
-          <button className="btn btn-sm join-item" onClick={() => {writeText(note)}}>Copy</button>
+          <button className="btn btn-sm join-item" onClick={ async () => {
+            await writeText(note);
+            let permissionGranted = await isPermissionGranted()
+            if (!isPermissionGranted) {
+              const permission = await requestPermission();
+              permissionGranted = permission==="granted";
+            }
+            if (isPermissionGranted) {
+              sendNotification({title: "notes", body: "copy txt"})
+            }
+          }}>Copy</button>
         </div>
       </div>
       {isRendered?
