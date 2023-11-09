@@ -9,7 +9,11 @@ function App() {
 
   async function createDB() {
     const loadedDB=await Database.load("sqlite:test.db");
-    console.log(loadedDB);
+    //const _first_load=await loadedDB.execute("CREATE TABLE IF NOT EXISTS notes (note_id CHAR NOT NULL PRIMARY KEY, note_text TEXT DEFAULT NULL);");
+    //const result2=await loadedDB.execute("INSERT into notes(note_id,note_text) VALUES ($1, $2)", [crypto.randomUUID(), "DEMO"]);
+    const result = await loadedDB.select("SELECT * FROM notes");
+    console.log(result);
+    setNotes(result);
   }
 
   async function loadNotes() {}
