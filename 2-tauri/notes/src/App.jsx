@@ -1,10 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Editor from "./Editor";
+import Database from "tauri-plugin-sql-api";
 
 
 function App() {
 
   const [notes,setNotes]=useState([1]);
+
+  async function createDB() {
+    const loadedDB=await Database.load("sqlite:test.db");
+    console.log(loadedDB);
+  }
+
+  async function loadNotes() {}
+
+  useEffect(() => {
+    createDB();
+  }, [])
 
   return (
     <div className="bg-gray-700 h-screen p-2">
