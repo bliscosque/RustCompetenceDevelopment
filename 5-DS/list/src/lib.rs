@@ -12,6 +12,7 @@ mod tests {
         ll.append("1st".to_string());
         ll.append("2nd".to_string());
         ll.append("3rd".to_string());
+        println!("{:#?}",ll);
         assert_eq!(ll.length,3);
     }
 }

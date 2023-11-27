@@ -3,7 +3,7 @@ use std::rc::Rc;
 
 type Link=Option<Rc<RefCell<Node>>>;
 
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 struct  Node {
     value: String,
     next: Link, //pointer to next node
@@ -20,6 +20,7 @@ impl Node {
 }
 
 //Single Linked List
+#[derive(Debug)]
 pub struct LinkedList {
     head: Link,
     tail: Link,
