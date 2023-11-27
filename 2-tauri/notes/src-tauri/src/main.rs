@@ -8,10 +8,17 @@ fn convert_markdown(text: &str) -> String {
     html
 }
 
+#[tauri::command]
+async fn open_editor(handler: tauri::AppHandle, editor_id: &str) -> Result<(), tauri::Error> {
+    let editor_window=tauri::WindowBuilder::new(&handler, editor_id, tauri::WindowUrl::App(("editor/".to_string()+editor_id).parse().unwrap()))
+        .build()
+        .unwrap();
+    Ok(())
+}
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_sql::Builder::default().build())
-        .invoke_handler(tauri::generate_handler![convert_markdown])
+        .invoke_handler(tauri::generate_handler![convert_markdown,open_editor])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

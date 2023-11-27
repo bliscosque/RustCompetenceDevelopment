@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Editor from "./Editor";
 import Database from "tauri-plugin-sql-api";
 import { addNoteDB, getSearch, removeNoteDB } from "./functions/db";
+import { invoke } from "@tauri-apps/api";
 
 
 function App() {
@@ -41,6 +42,10 @@ function App() {
     await loadNotes(db);
   }
 
+  async function handleOpenWindow(uuid) {
+    await invoke ("open_editor",{editorId: String(uuid)})
+  }
+
   useEffect(() => {
     createDB();
   }, [])
@@ -55,7 +60,7 @@ function App() {
       {
         notes.map((item) => (
           <div key={item.note_id} className="px-2 flex flex-row justify-between items-center bg-green-200 border-green-500 my-2">
-            <div className="cursor-pointer w-full h-full"><h2>{item.note_text}</h2></div>
+            <div onClick={async () => {await handleOpenWindow(item.note_id)}} className="cursor-pointer w-full h-full min-h-6"><h2>{item.note_text}</h2></div>
             <button onClick={async () => {await handleRemoveNote(item.note_id)}} className="btn btn-sm">Delete me</button>
           </div>
       ))}
