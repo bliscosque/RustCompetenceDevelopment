@@ -37,11 +37,26 @@ impl LinkedList {
     }
     pub fn append(&mut self, value: String) {
         let new=Node::new(value);
-        match self.tail.take() {
+        match self.tail.take() { // take remove last elem and returns it
             Some(old) => old.borrow_mut().next=Some(new.clone()),
             None => self.head=Some(new.clone())
         };
         self.length+=1;
         self.tail=Some(new);
+    }
+    pub fn pop(&mut self) -> Option<String> {
+        self.head.take().map(|head| {
+            if let Some(next)=head.borrow_mut().next.take() {
+                self.head=Some(next);
+            } else {
+                self.tail.take();
+            } 
+            self.length-=1;
+            Rc::try_unwrap(head)
+                .ok()
+                .expect("Something went wrong")
+                .into_inner()
+                .value
+        })
     }
 }
