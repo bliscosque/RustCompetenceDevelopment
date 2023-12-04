@@ -21,4 +21,16 @@ mod tests {
         println!("{}, {}, {}",first.unwrap(), second.unwrap(), third.unwrap());
         assert_eq!(ll.length,0);
     }
+
+    #[test]
+    fn linked_list_box() {
+        //create
+        let mut ll=linked_list_box::LinkedList::new();
+        
+        ll.push_front(3);
+        ll.push_back(8);
+        ll.push_front(1);
+        println!("{:?}",ll);
+        assert!(true);
+    }
 }
