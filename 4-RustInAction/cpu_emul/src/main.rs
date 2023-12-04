@@ -32,19 +32,17 @@ impl CPU {
                 0x0000 => { return; },
                 0x00E0 => { /* CLEAR SCREEN */ },
                 0x00EE => { self.ret(); },
-                // 0x1000..=0x1FFF => { self.jmp(addr); },
-                0x2000..=0x2FFF => { self.call(addr); }
-                /*
+                0x1000..=0x1FFF => { self.jmp(addr); }, 
+                0x2000..=0x2FFF => { self.call(addr); },
                 0x3000..=0x3FFF => { self.se(x, kk); },
                 0x4000..=0x4FFF => { self.sne(x, kk); },
                 0x5000..=0x5FFF => { self.se(x, y); },
                 0x6000..=0x6FFF => { self.ld(x, kk); },
                 0x7000..=0x7FFF => { self.add(x, kk); },
-                */
                 0x8000..=0x8FFF => {
                     match op_minor { //last bit
-                        //0 => { self.ld(x, self.registers[y as usize]) },
-                        //1 => { self.or_xy(x, y) },
+                        0 => { self.ld(x, self.registers[y as usize]) },
+                        1 => { self.or_xy(x, y) },
                         //2 => { self.and_xy(x, y) },
                         //3 => { self.xor_xy(x, y) },
                         4 => { self.add_xy(x, y); },
@@ -69,19 +67,56 @@ impl CPU {
         self.position_in_memory=addr as usize;
     }
 
+    // opcode 1xxx - JMP at addr (xxx)
+    fn jmp(&mut self, addr: u16) {
+        self.position_in_memory=addr as usize;
+    }
+
+    // opcode 0x3xkk - Store if equals OR
+    // opcode 0x5xyN (vx=x, kk=y)
+    fn se(&mut self, vx:u8, kk:u8) {
+        if vx==kk {
+            self.position_in_memory+=2;
+        }
+    }
+
+    // opcode 0x4xkk - Store if NOT equals
+    fn sne(&mut self, vx:u8, kk:u8) {
+        if vx!=kk {
+            self.position_in_memory+=2;
+        }
+    }
+
+    // opcode 0x6xkk - Load Data - sets the value kk into register vx
+    fn ld(&mut self, vx:u8, kk:u8){
+        self.registers[vx as usize] = kk;
+    }
+
+    // opcode 0x7xkk - Add value kk into register vx
+    fn add(&mut self, vx:u8, kk:u8) {
+        self.registers[vx as usize] += kk;
+    }
+
     // opcode 8xy4 - ADD (reg x=reg x + reg y)
     fn add_xy(&mut self, x:u8, y:u8) {
         self.registers[x as usize] += self.registers[y as usize];
         //TODO: CARRY FLAG
     }
 
+    //opcode 8xy1 - OR (reg x= reg x OR reg y) 
+    fn or_xy(&mut self, x:u8, y:u8) {
+        let x_ = self.registers[x as usize];
+        let y_ = self.registers[y as usize];
+        self.registers[x as usize] = x_ | y_;
+    }
+
     // opcode 00EE RET (return from subroutine)
     fn ret(&mut self) {
         if self.stack_pointer==0 {
-            panic!("Stack underflow")M
+            panic!("Stack underflow");
         }
         self.stack_pointer-=1;
-        self.position_in_memory = self.stack[self.stack_pointer] as uside;
+        self.position_in_memory = self.stack[self.stack_pointer] as usize;
     }
 }
 
@@ -104,6 +139,7 @@ fn main() {
     //Pos 0x100 of the Call
     cpu.memory[0x100] = 0x80; cpu.memory[0x101] = 0x14; // ADD reg 0 with reg 1 (registers: [15, 10,...])  reg0=5+10=15
     cpu.memory[0x102] = 0x80; cpu.memory[0x103] = 0x14; // ADD reg 0 with reg 1 (registers: [15, 10,...])  reg0=15+10=25
+    cpu.memory[0x104] = 0x00; cpu.memory[0x105] = 0xEE; // return of function (function is called once again... so reg0 will be summed with +20...45)
 
     cpu.run();
     println!("{:?}",cpu.registers);
