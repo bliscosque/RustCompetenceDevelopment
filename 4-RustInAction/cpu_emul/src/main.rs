@@ -43,8 +43,8 @@ impl CPU {
                     match op_minor { //last bit
                         0 => { self.ld(x, self.registers[y as usize]) },
                         1 => { self.or_xy(x, y) },
-                        //2 => { self.and_xy(x, y) },
-                        //3 => { self.xor_xy(x, y) },
+                        2 => { self.and_xy(x, y) },
+                        3 => { self.xor_xy(x, y) },
                         4 => { self.add_xy(x, y); },
                         _ => { todo!("opcode: {:04x}", opcode); },
                     }
@@ -97,17 +97,33 @@ impl CPU {
         self.registers[vx as usize] += kk;
     }
 
-    // opcode 8xy4 - ADD (reg x=reg x + reg y)
-    fn add_xy(&mut self, x:u8, y:u8) {
-        self.registers[x as usize] += self.registers[y as usize];
-        //TODO: CARRY FLAG
-    }
+
 
     //opcode 8xy1 - OR (reg x= reg x OR reg y) 
     fn or_xy(&mut self, x:u8, y:u8) {
         let x_ = self.registers[x as usize];
         let y_ = self.registers[y as usize];
         self.registers[x as usize] = x_ | y_;
+    }
+
+    //opcode 8xy2 - OR (reg x= reg x OR reg y) 
+    fn and_xy(&mut self, x:u8, y:u8) {
+        let x_ = self.registers[x as usize];
+        let y_ = self.registers[y as usize];
+        self.registers[x as usize] = x_ & y_;
+    }
+
+    //opcode 8xy3 - XOR (reg x= reg x OR reg y) 
+    fn xor_xy(&mut self, x:u8, y:u8) {
+        let x_ = self.registers[x as usize];
+        let y_ = self.registers[y as usize];
+        self.registers[x as usize] = x_ ^ y_;
+    }
+
+    // opcode 8xy4 - ADD (reg x=reg x + reg y)
+    fn add_xy(&mut self, x:u8, y:u8) {
+        self.registers[x as usize] += self.registers[y as usize];
+        //TODO: CARRY FLAG
     }
 
     // opcode 00EE RET (return from subroutine)
