@@ -30,6 +30,10 @@ mod tests {
         ll.push_front(3);
         ll.push_back(8);
         ll.push_front(1);
+
+        ll.insert_sorted(0);
+        ll.insert_sorted(2);
+        ll.insert_sorted(20);
         println!("{:?}",ll);
         assert!(true);
     }

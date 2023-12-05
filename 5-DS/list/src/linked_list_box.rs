@@ -25,29 +25,17 @@ impl<T:PartialOrd> LinkedList<T> {
         }
     }
 
-    /*
     pub fn insert_sorted(&mut self, data: T) {
-        match self.0 {
+        match &mut self.0 {
             Some((cur_val,ref mut child)) => {
-                if cur_val < data {
-                    match child.0 {
-                        Some((next_val,_)) => {
-                            if next_val > data {
-                                child.insert_sorted(data)
-                            }
-                            else {
-                                let t=self.0.take();
-                                self.0 = Some((data,Box::new(LinkedList(t))));
-                            }
-                        },
-                        None => self.push_front(data),                        
-                    }
-
+                if data <= *cur_val {
+                    self.push_front(data);                       
+                } else {
+                    child.insert_sorted(data);
                 }
                 
             },
             None => self.push_front(data),            
         }
     }
-    */
 }
