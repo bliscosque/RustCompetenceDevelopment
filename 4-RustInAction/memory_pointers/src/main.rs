@@ -15,11 +15,13 @@ fn main() {
     unsafe {
         let b_ptr=&B as *const u8 as *mut u8; //Ref -> *mut precisa de *const antes
 
-        b=String::from_raw_parts(b_ptr, 10, 10);
+        //b = String::from_raw_parts(b_ptr, 10, 10);
 
-        let c_ptr=&C as * const u8 as *const c_char;
+        let c_ptr=&C as *const u8 as *const c_char;
 
         c= CStr::from_ptr(c_ptr).to_string_lossy();
     }
-    println!("a: {}, b: {}, c: {}", a, b, c);
+    //println!("a: {}, b: {}, c: {}", a, b, c);
+    println!("a: {}, c: {}", a, c);
+
 }
