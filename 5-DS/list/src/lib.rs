@@ -1,5 +1,6 @@
 mod linked_list;
 mod linked_list_box;
+mod double_linked_list;
 
 mod tests {
     use crate::*;
@@ -36,5 +37,13 @@ mod tests {
         ll.insert_sorted(20);
         println!("{:?}",ll);
         assert!(true);
+    }
+    #[test]
+    fn double_ll() {
+        let mut dll=double_linked_list::DLL::new();
+        dll.push_front(6);
+        dll.push_back(11);
+        dll.push_front(5);
+        println!("dll {:?}",dll);
     }
 }
