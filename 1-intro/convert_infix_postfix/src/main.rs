@@ -16,6 +16,14 @@ fn get_next_token(exp: &Vec<char>, idx: usize) -> (String,usize) {
     }
 }
 
+fn get_precedence(op: &str) -> i32 {
+    match op {
+        "+"|"-" => 1,
+        "*"|"/" => 2,
+        _ => 0,
+    }
+}
+
 fn conv_infix_postfix(exp: &String) -> Vec<String> {
     let mut ans=Vec::new();
     let mut my_stack:Vec<String>=Vec::new();
@@ -26,17 +34,31 @@ fn conv_infix_postfix(exp: &String) -> Vec<String> {
         (token,idx)=get_next_token(&exp_vec_chars, idx);
         let tchars:Vec<char> = token.chars().collect();
         match tchars[0] {
-            '(' => ans.push(token.clone()),
+            '(' => my_stack.push(token.clone()),
             ')' => {
-                let mut t=my_stack.pop().unwrap();
-                while t!="(" {
+                while let Some(t) = my_stack.pop() {
+                    if t == "(" {
+                        break;
+                    }
                     ans.push(t);
-                    t=my_stack.pop().unwrap();
                 }
+            },
+            '+'|'-'|'*'|'/' => {
+                while let Some(last) = my_stack.last() {
+                    if get_precedence(last) >= get_precedence(&token) {
+                        ans.push(my_stack.pop().unwrap());
+                    } else {
+                        break;
+                    }
+                }
+                my_stack.push(token.clone());
             }
-            _ =>{}
+            _ => ans.push(token.clone()),
         }
-        println!("token: {}, ans: {:?}",token, ans);
+        println!("token: {}, stack: {:?}, ans: {:?}",token, my_stack, ans);
+    }
+    while let Some(t) = my_stack.pop() {
+        ans.push(t);
     }
     return ans;
 }
