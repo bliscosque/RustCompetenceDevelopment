@@ -1,5 +1,21 @@
 use std::char;
 
+/*
+    1. priorities of operators 
+        ->  +,- 
+        ->  *,/ 
+        ->  ^
+    2. if scanned oeprator is <= then the top of the stack in priority 
+    then pop opertors until we have low priority. Add the the poped elements 
+    to the postfix
+
+    3. if "(" pust it to the stack 
+
+    4. if ")" pop elements until "(" and add poped elements to postfix
+
+    5. if operand then just add to the postfix
+*/ 
+
 fn get_next_token(exp: &Vec<char>, idx: usize) -> (String,usize) {
     match exp[idx] {
         '(' | ')' | '+' | '-' | '*' | '/' => (exp[idx].to_string(),idx+1),
