@@ -71,7 +71,7 @@ fn conv_infix_postfix(exp: &String) -> Vec<String> {
             }
             _ => ans.push(token.clone()),
         }
-        println!("token: {}, stack: {:?}, ans: {:?}",token, my_stack, ans);
+        // println!("token: {}, stack: {:?}, ans: {:?}",token, my_stack, ans);
     }
     while let Some(t) = my_stack.pop() {
         ans.push(t);
@@ -79,7 +79,44 @@ fn conv_infix_postfix(exp: &String) -> Vec<String> {
     return ans;
 }
 
+
+/*
+Rules for postfix evaluation 
+	1. If operand -> push to stack
+	2. If operation pop two selements perform operation and then push into the stack
+*/
+fn ans(postfix: Vec<String>) -> String {
+    let mut my_stack:Vec<String>=Vec::new();
+    for item in &postfix {
+        match item.as_str() {
+            "+"|"-"|"*"|"/" => {
+                let ans:f32;
+                let op2: f32=my_stack.pop().unwrap().parse().expect("Error when parsing");
+                let op1:f32=my_stack.pop().unwrap().parse().expect("Error when parsing");
+                if item=="+" { 
+                    ans=op1+op2; 
+                }
+                else if item=="-" { 
+                    ans=op1-op2; 
+                }
+                else if item=="*" {
+                    ans=op1*op2; 
+                }
+                else {
+                    ans=op1/op2;
+                }
+                my_stack.push(ans.to_string())
+            }
+            _ => my_stack.push(item.to_string()),
+        }
+        println!("token: {}, Stack: {:?}", item, my_stack);
+    }
+    return my_stack.pop().unwrap();
+}
+
 fn main() {
     let s1=String::from("(33+45/3*(2+9)-50)");
-    println!("{:?}",conv_infix_postfix(&s1));
+    let postfix=conv_infix_postfix(&s1);
+    println!("{:?}",postfix);
+    println!("Answer: {}",ans(postfix));
 }
