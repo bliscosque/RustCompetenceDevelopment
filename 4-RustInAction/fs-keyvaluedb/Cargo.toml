@@ -6,3 +6,15 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+byteorder="1"
+crc="1"
+serde="1"
+serde_derive="1"
+
+[lib]
+name="libactionkv" # giving a name to the lib
+path="src/lib.rs"  # path...
+
+[[bin]]
+name="kvDB"
+path="src/kvDB.rs"
