@@ -22,19 +22,20 @@ async fn index(hb: web::Data<Handlebars<'_>>) -> HttpResponse {
             } 
         ] 
     });
+    //anything that implements Serialize trait from serde can be rendered
     let body = hb.render("index", &data).unwrap(); 
     HttpResponse::Ok().body(body)
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let mut handlebars = Handlebars::new();
+    let mut handlebars = Handlebars::new(); //start handlebars template
     let options = DirectorySourceOptions {
         tpl_extension: ".html".to_string(),
         ..Default::default()
     };
-    handlebars.register_templates_directory("./static", options).unwrap();
-    let handlebars_ref = web::Data::new(handlebars);
+    handlebars.register_templates_directory("./static", options).unwrap(); //register template directory. Needs dir_source feature enabled
+    let handlebars_ref = web::Data::new(handlebars); // allow compiled templates to be shared accross threads
 
     println!("Listening on port 8080");
     HttpServer::new(move || {App::new().app_data(handlebars_ref.clone()).service(Files::new("/static", "static").show_files_listing(),)
